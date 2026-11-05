@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KAN 플랜</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* 다크 터미널 하나로 고정. 의미 색: 숏=코랄, 익절·매수 대기=민트, 현물=골드, 선물=페리윙클, 바닥=로즈, 현재가=흰 글로우
+     레이아웃: 머리 → 종목 탭 → (지금 할 일 카드 → 가격 지도 → 레벨 표) → 원칙 → 기록 */
+  --bg: #0e1626;
+  --bg2: #0b111e;
+  --panel: #152036;
+  --line: #26344f;
+  --text: #e9eef7;
+  --muted: #8d9ab3;
+  --short: #ff6b5e;
+  --take: #3dd9a8;
+  --spot: #f5b841;
+  --fut: #8c9eff;
+  --bottom: #ff4f7b;
+  --ref: #6f7d99;
+  --display: "Chakra Petch", "IBM Plex Sans KR", system-ui, sans-serif;
+  --body: "IBM Plex Sans KR", system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: radial-gradient(1200px 600px at 80% -10%, #18264a 0%, transparent 60%), var(--bg); background-color: var(--bg); color: var(--text); font-family: var(--body); font-size: 16px; line-height: 1.55; -webkit-text-size-adjust: 100%; min-height: 100%; }
+.wrap { max-width: 960px; margin: 0 auto; padding: 26px 16px 56px; display: grid; gap: 24px; }
+h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; letter-spacing: 0.01em; }
+.num { font-family: var(--display); font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+:focus-visible { outline: 2px solid var(--spot); outline-offset: 2px; }
+
+header { display: grid; gap: 6px; }
+header h1 { font-size: clamp(34px, 7vw, 52px); font-weight: 700; line-height: 1; }
+header h1 b { color: var(--spot); }
+.updated { color: var(--muted); font-size: 14px; }
+.updated .num { color: var(--text); }
+
+/* 탭 */
+.tabs { position: sticky; top: 0; z-index: 5; display: flex; gap: 6px; padding: 8px 0; background: linear-gradient(var(--bg) 70%, transparent); overflow-x: auto; }
+.tab { font-family: var(--display); font-size: 15px; font-weight: 600; color: var(--muted); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; cursor: pointer; white-space: nowrap; display: flex; gap: 8px; align-items: center; }
+.tab .px { font-weight: 500; font-size: 13px; color: var(--muted); }
+.tab[aria-selected="true"] { color: var(--bg); background: var(--text); border-color: var(--text); }
+.tab[aria-selected="true"] .px { color: #3a4560; }
+
+/* 카드 */
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 12px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; display: grid; gap: 10px; align-content: start; }
+.card h3 { font-size: 14px; color: var(--muted); font-weight: 600; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.tag { font-family: var(--body); font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; border: 1px solid currentColor; }
+.c-short { color: var(--short); } .c-take { color: var(--take); } .c-spot { color: var(--spot); } .c-fut { color: var(--fut); } .c-bottom { color: var(--bottom); } .c-ref { color: var(--ref); }
+.big { font-size: 30px; font-weight: 700; line-height: 1.1; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.big small { font-family: var(--body); font-size: 14px; font-weight: 500; color: var(--muted); }
+.rows { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.rows li { display: grid; grid-template-columns: 96px 1fr; gap: 10px; font-size: 15px; }
+.rows li > span:first-child { color: var(--muted); }
+.next { border-left: 3px solid var(--spot); padding: 2px 0 2px 10px; font-size: 15px; }
+.spark { width: 100%; height: 64px; display: block; }
+.spark-cap { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+
+/* 가격 지도 */
+.mapcard { background: linear-gradient(180deg, #172440 0%, var(--bg2) 100%); border: 1px solid var(--line); border-radius: 16px; padding: 14px 12px 12px 0; overflow-x: auto; }
+.maphead { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 0 0 8px 16px; flex-wrap: wrap; }
+.maphead h2 { font-size: 20px; font-weight: 600; }
+.legend { display: flex; gap: 10px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
+.ladder { position: relative; min-width: 340px; }
+.lanes { position: absolute; inset: 0 0 0 60px; display: grid; }
+.lane { position: relative; border-left: 1px dashed var(--line); }
+.lane-head { position: absolute; top: 0; left: 0; right: 0; text-align: center; font-size: 12px; font-weight: 600; color: var(--muted); }
+.tick { position: absolute; left: 0; width: 54px; text-align: right; transform: translateY(-50%); font-size: 12px; color: var(--muted); }
+.gl { position: absolute; left: 60px; right: 0; height: 1px; background: var(--line); opacity: .5; }
+.band { position: absolute; left: 6px; right: 6px; border-radius: 9px; padding: 6px 8px; font-size: 12.5px; line-height: 1.35; display: flex; flex-direction: column; justify-content: center; gap: 2px; overflow: hidden; }
+.band strong { font-family: var(--display); font-size: 14px; }
+.band span { color: var(--text); opacity: .86; }
+.band.take { background: linear-gradient(180deg, color-mix(in srgb, var(--take) 26%, transparent), color-mix(in srgb, var(--take) 8%, transparent)); border: 1px solid color-mix(in srgb, var(--take) 55%, transparent); color: var(--take); }
+.band.spot { background: linear-gradient(180deg, color-mix(in srgb, var(--spot) 24%, transparent), color-mix(in srgb, var(--spot) 7%, transparent)); border: 1px solid color-mix(in srgb, var(--spot) 55%, transparent); color: var(--spot); }
+.band.fut  { background: linear-gradient(180deg, color-mix(in srgb, var(--fut) 28%, transparent), color-mix(in srgb, var(--fut) 10%, transparent)); border: 1px solid color-mix(in srgb, var(--fut) 60%, transparent); color: var(--fut); }
+.band.live { box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 40%, transparent), 0 0 18px color-mix(in srgb, currentColor 35%, transparent); }
+.lvl { position: absolute; left: 0; right: 0; height: 0; border-top: 2px solid currentColor; }
+.lvl.dash { border-top-style: dashed; }
+.lvl.ref { border-top: 1px dotted currentColor; }
+.lvl.gone { opacity: .5; }
+.lvl .lab { position: absolute; left: 6px; right: 6px; bottom: 3px; font-size: 12.5px; line-height: 1.3; }
+.lvl.below .lab { bottom: auto; top: 3px; }
+.lvl .lab strong { font-family: var(--display); font-size: 14px; font-variant-numeric: tabular-nums; }
+.lvl .lab span { color: var(--text); opacity: .86; }
+.lvl .lab em { font-style: normal; font-family: var(--display); font-size: 12px; color: var(--muted); margin-left: 4px; }
+.lvl.gone .lab strong { text-decoration: line-through; }
+.lvl.full { left: 60px; }
+.now { position: absolute; left: 0; right: 0; height: 0; border-top: 1px solid #fff; box-shadow: 0 0 10px 1px rgba(255,255,255,.55); z-index: 3; pointer-events: none; }
+.now .pill { position: absolute; right: 4px; top: 0; transform: translateY(-50%); background: #fff; color: #0b111e; font-family: var(--display); font-weight: 700; font-size: 12.5px; padding: 2px 7px; border-radius: 6px; white-space: nowrap; }
+.now .pill small { font-weight: 600; font-size: 10.5px; color: #3a4560; margin-left: 3px; }
+.mapnote { padding: 10px 0 0 16px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; color: var(--muted); }
+.chip { font-family: var(--display); font-size: 13px; padding: 3px 10px; border-radius: 999px; background: color-mix(in srgb, var(--spot) 12%, transparent); color: var(--spot); border: 1px solid color-mix(in srgb, var(--spot) 40%, transparent); }
+
+/* 레벨 표 */
+.lvtable { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+.lvtable th { text-align: left; font-weight: 600; color: var(--muted); font-size: 12.5px; padding: 0 8px 8px; border-bottom: 1px solid var(--line); }
+.lvtable td { padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.lvtable td.p { font-family: var(--display); font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+.lvtable td.d { font-family: var(--display); font-variant-numeric: tabular-nums; color: var(--muted); text-align: right; white-space: nowrap; }
+.lvtable tr.nowrow td { background: rgba(255,255,255,.06); font-weight: 600; }
+.st { font-size: 11.5px; font-weight: 600; padding: 1px 7px; border-radius: 999px; border: 1px solid currentColor; margin-left: 6px; white-space: nowrap; }
+.table-box { overflow-x: auto; }
+
+/* 원칙·기록 */
+section > h2 { font-size: 20px; font-weight: 600; margin-bottom: 12px; }
+.rules { display: grid; gap: 10px; }
+.rule { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--spot); border-radius: 14px; padding: 14px 18px; }
+.rule q { quotes: none; font-size: 18px; font-weight: 600; }
+.rule p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+.log { list-style: none; margin: 0; padding: 0; }
+.log li { display: grid; grid-template-columns: 110px 1fr; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); font-size: 15px; }
+.log li:first-child { border-top: 0; }
+.log time { color: var(--muted); font-family: var(--display); font-variant-numeric: tabular-nums; }
+.empty { border: 1px dashed var(--line); border-radius: 14px; padding: 14px 18px; color: var(--muted); font-size: 14.5px; }
+footer { color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 16px; display: grid; gap: 4px; }
+
+@media (max-width: 420px) {
+  .rows li { grid-template-columns: 82px 1fr; }
+  .log li { grid-template-columns: 1fr; gap: 2px; }
+  .band, .lvl .lab { font-size: 11.5px; }
+  .band { padding: 5px 6px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><b>KAN</b> 플랜</h1>
+    <div class="updated">칸 매매 계획 정리 | 마지막 업데이트 <span class="num" id="upd"></span></div>
+  </header>
+
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+  <main id="view" style="display:grid;gap:16px"></main>
+
+  <section>
+    <h2>원칙</h2>
+    <div class="rules" id="rules"></div>
+  </section>
+
+  <section>
+    <h2>업데이트 기록</h2>
+    <ul class="log" id="log"></ul>
+  </section>
+
+  <footer>
+    <div>무료로 공유하는 개인 매매 계획이에요. 투자 권유가 아니고, 진입·손절은 각자 판단하고 각자 책임져요.</div>
+    <div>현재가는 실시간이 아니라 표시된 기준 시각의 가격이에요. 진입 전에 거래소 시세를 꼭 확인하세요.</div>
+  </footer>
+</div>
+
+<script>
+/* ======================= 업데이트는 여기만 고치면 돼요 ======================= */
+const UPDATED = "2026-11-06 08:46";
+
+const ASSETS = [
+  {
+    id: "btc", name: "BTC", unit: "", scale: "log", lo: 20500, hi: 100000,
+    now: { p: 75590, at: "11/6 08:00" },
+    lanes: ["숏 관리", "현물", "선물"],
+    summary: {
+      title: "BTC", tag: ["숏 유지", "short"], big: "87.3k", bigNote: "숏 평단",
+      rows: [["1차 TP", "59k"], ["분할 익절", "56k부터 35~47k"], ["현물 매집", "48k부터 24k"], ["선물 매집", "39~41k, 저배율"]],
+      next: "일봉이 76k 아래로 마감하면 숏 추가"
+    },
+    items: [
+      { kind: "level", lane: 1, p: 87300, c: "short", label: "숏 평단", note: "유지 중", st: ["보유", "short"] },
+      { kind: "level", lane: 1, p: 76000, c: "short", dash: true, label: "숏 추가", note: "일봉 76k 아래 마감 시", st: ["대기", "spot"] },
+      { kind: "level", lane: 1, p: 59000, c: "take", label: "1차 TP", note: "", st: ["대기", "spot"] },
+      { kind: "band", lane: 1, top: 56000, bot: 35000, c: "take", label: "56k부터 분할 익절", note: "35~47k까지 숏 나눠서 정리", st: ["대기", "spot"] },
+      { kind: "band", lane: 2, top: 48000, bot: 24000, c: "spot", label: "현물 매집", note: "48k부터 24k까지 분할", st: ["대기", "spot"] },
+      { kind: "band", lane: 3, top: 41000, bot: 39000, c: "fut", label: "39~41k", note: "선물 저배율 매집 시작", st: ["대기", "spot"] },
+      { kind: "level", lane: 3, p: 23000, c: "fut", dash: true, below: true, label: "청산가 23k 아래", note: "안전하게", noDist: true },
+      { kind: "level", lane: 0, p: 24000, c: "bottom", label: "반등 시작 최저점 예상", note: "" }
+    ],
+    chips: { label: "차트에 적힌 가격", list: [48000, 41000, 35000, 32000] },
+    note: "월봉 기준 하락 채널 안에서 진행 중",
+    spark: { key: "BTC", cap: "최근 4일 (1시간봉)" }
+  },
+  {
+    id: "soxl", name: "SOXL", unit: "$", scale: "log", lo: 33, hi: 70,
+    now: { p: 43.92, at: "11/5 미국장 중" },
+    lanes: ["매매 계획"],
+    summary: {
+      title: "SOXL (반도체 3배)", tag: ["매수 대기", "take"], big: "포지션 없음", bigNote: "",
+      rows: [["지난 매매", "30% 익절, 나머지 본전($44) 정리"], ["남은 자리", "$38, $36"], ["원칙", "$36까지만 받음"]],
+      next: "38, 36달러에서 다시 매수 대기"
+    },
+    items: [
+      { kind: "level", lane: 0, p: 66.68, c: "ref", ref: true, label: "11/4 종가", note: "11/5 반도체 폭락 직전", noDist: false },
+      { kind: "level", lane: 1, p: 45, c: "take", label: "매수 자리", note: "지나감, 안 받음", gone: true, st: ["지나감", "ref"] },
+      { kind: "level", lane: 1, p: 44, c: "short", dash: true, below: true, label: "평단·본전", note: "본전에서 정리 완료", st: ["완료", "ref"] },
+      { kind: "level", lane: 1, p: 38, c: "take", label: "매수 자리", note: "", st: ["대기", "take"] },
+      { kind: "level", lane: 1, p: 36, c: "take", label: "마지막 매수 자리", note: "36까지만 받음", below: true, st: ["대기", "take"] }
+    ],
+    note: "11/5 반도체지수 −12.25%, SOXL은 장중 −34%까지 빠졌어요"
+  },
+  {
+    id: "nasdaq", name: "나스닥", unit: "$", scale: "linear", lo: 250, hi: 322,
+    now: { p: 266.85, at: "11/5 종가" },
+    lanes: ["참고 가격"],
+    summary: {
+      title: "나스닥100 (QQQM 기준)", tag: ["계획 없음", "ref"], big: "$266.85", bigNote: "QQQM 11/5 종가, 하루 −6.3%",
+      rows: [["52주 고점", "$314.11 (−15.0%)"], ["200일선", "$280.28 (−4.8%)"], ["나스닥 종합", "24,315, 조정 구간 진입"]],
+      next: "칸 계획이 나오면 여기에 자리를 그려요"
+    },
+    items: [
+      { kind: "level", lane: 0, p: 314.11, c: "ref", ref: true, label: "52주 고점", note: "" },
+      { kind: "level", lane: 0, p: 280.28, c: "ref", ref: true, label: "200일 이동평균", note: "" }
+    ],
+    empty: "칸이 아직 나스닥 자리를 주지 않았어요. 지금은 참고 가격만 표시해요.",
+    spark: { key: "QQQM", cap: "QQQM 최근 120거래일 종가" }
+  }
+];
+
+const RULES = [
+  { q: "이미 지나간 자리는 안 받는다", p: "놓친 매수 자리를 쫓아가서 사지 않아요. 예: SOXL 45는 지나갔으니 38, 36 두 자리만 남김." },
+  { q: "반등 10% 이상 나온 뒤 본전 건드리면 본전에서 정리", p: "한 번 크게 반등한 포지션은 손실로 돌리지 않아요." }
+];
+
+const LOG = [
+  { t: "11/06 08:50", m: "종목 탭 추가 (BTC, SOXL, 나스닥). 가격 지도에 현재가와 거리 표시." },
+  { t: "11/06 08:37", m: "SOXL 포지션 없음으로 변경. 38, 36달러 매수 대기." },
+  { t: "11/06 08:30", m: "첫 정리. BTC 숏 87.3k 유지, 76k 일봉 마감 시 추가, 1차 TP 59k. SOXL 30% 익절, 44 본전, 38·36 매수 자리." }
+];
+
+const SERIES = { BTC: [[1793577600,78095],[1793581200,78370],[1793584800,78413],[1793588400,78582],[1793592000,78373],[1793595600,78341],[1793599200,78125],[1793602800,78073],[1793606400,78191],[1793610000,78027],[1793613600,77936],[1793617200,77855],[1793620800,77766],[1793624400,77900],[1793628000,77836],[1793631600,77486],[1793635200,77469],[1793638800,77116],[1793642400,76993],[1793646000,77063],[1793649600,76763],[1793653200,76828],[1793656800,76920],[1793660400,76796],[1793664000,77103],[1793667600,77096],[1793671200,76696],[1793674800,76909],[1793678400,76916],[1793682000,76628],[1793685600,76559],[1793689200,76797],[1793692800,76606],[1793696400,77044],[1793700000,77107],[1793703600,77074],[1793707200,77395],[1793710800,77368],[1793714400,77361],[1793718000,77657],[1793721600,77707],[1793725200,77619],[1793728800,77560],[1793732400,77588],[1793736000,77838],[1793739600,77877],[1793743200,77863],[1793746800,77439],[1793750400,77221],[1793754000,77011],[1793757600,76132],[1793761200,76450],[1793764800,77346],[1793768400,77717],[1793772000,77965],[1793775600,78105],[1793779200,78462],[1793782800,78360],[1793786400,78570],[1793790000,78441],[1793793600,78262],[1793797200,78339],[1793800800,79302],[1793804400,80274],[1793808000,80491],[1793811600,80393],[1793815200,80319],[1793818800,79952],[1793822400,80105],[1793826000,80201],[1793829600,80689],[1793833200,80466],[1793836800,80517],[1793840400,80646],[1793844000,80541],[1793847600,80518],[1793851200,80488],[1793854800,80371],[1793858400,80625],[1793862000,80364],[1793865600,80500],[1793869200,80445],[1793872800,80285],[1793876400,80389],[1793880000,79671],[1793883600,79657],[1793887200,78280],[1793890800,76000],[1793894400,76350],[1793898000,75904],[1793901600,76053],[1793905200,76322],[1793908800,76187],[1793912400,75815],[1793916000,75674],[1793919600,75590]], QQQM: [[1779111000,290.63],[1779197400,288.84],[1779283800,293.63],[1779370200,294.21],[1779456600,295.44],[1779802200,300.68],[1779888600,300.38],[1779975000,302.85],[1780061400,303.96],[1780320600,305.82],[1780407000,307.23],[1780493400,306.61],[1780579800,304.94],[1780666200,290.35],[1780925400,294.81],[1781011800,291.52],[1781098200,285.92],[1781184600,295.02],[1781271000,297.01],[1781530200,306.24],[1781616600,300.56],[1781703000,297.57],[1781789400,304.52],[1782135000,303.9],[1782221400,293.87],[1782307800,292.63],[1782394200,294.88],[1782480600,290.95],[1782739800,298.05],[1782826200,302.97],[1782912600,298.61],[1782999000,293.42],[1783344600,297.52],[1783431000,292.14],[1783517400,292.87],[1783603800,297.78],[1783690200,298.72],[1783949400,293.06],[1784035800,296.31],[1784122200,295.56],[1784208600,290.68],[1784295000,286.31],[1784554200,286.58],[1784640600,291.9],[1784727000,290.42],[1784813400,284.98],[1784899800,281.68],[1785159000,280.86],[1785245400,278.14],[1785331800,272.51],[1785418200,281.35],[1785504600,283.29],[1785763800,288.27],[1785850200,298.03],[1785936600,295.35],[1786023000,294.26],[1786109400,297.7],[1786368600,296.85],[1786455000,295.83],[1786541400,297.98],[1786627800,301.41],[1786714200,301.01],[1786973400,300.52],[1787059800,295.45],[1787146200,294.85],[1787232600,292.79],[1787319000,293.76],[1787578200,290.81],[1787664600,292.66],[1787751000,292.9],[1787837400,296.92],[1787923800,295],[1788183000,295.18],[1788269400,291.4],[1788355800,292.02],[1788442200,295.51],[1788528600,296.07],[1788874200,295.76],[1788960600,294.97],[1789047000,291.8],[1789133400,294.39],[1789392600,292.02],[1789479000,290.09],[1789565400,290.2],[1789651800,295.2],[1789738200,296.91],[1789997400,305.27],[1790083800,307.78],[1790170200,305.14],[1790256600,305.14],[1790343000,306.54],[1790602200,303.29],[1790688600,303.83],[1790775000,304.64],[1790861400,305.57],[1790947800,308.69],[1791207000,311.4],[1791293400,312.76],[1791379800,311.94],[1791466200,307.85],[1791552600,309.39],[1791811800,307.19],[1791898200,306.16],[1791984600,300.13],[1792071000,299.79],[1792157400,292.26],[1792416600,295.78],[1792503000,295.59],[1792589400,298.64],[1792675800,290.13],[1792762200,290.06],[1793021400,293.26],[1793107800,296.96],[1793194200,298.71],[1793280600,294.53],[1793367000,284.34],[1793629800,280.49],[1793716200,282.23],[1793802600,284.92],[1793889000,266.85]] };
+/* ========================================================================== */
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const fmt = (a, p) => a.unit === "" ? (p >= 1000 ? (Math.round(p / 100) / 10).toString().replace(/\.0$/, "") + "k" : String(p)) : a.unit + (p >= 100 ? p.toFixed(2).replace(/\.00$/, "") : p.toFixed(2).replace(/0$/, "").replace(/\.0$/, ""));
+const pct = (from, to) => { const v = (to / from - 1) * 100; return (v > 0 ? "+" : "−") + Math.abs(v).toFixed(1) + "%"; };
+
+$("upd").textContent = UPDATED;
+
+/* 탭 */
+function tabs(active) {
+  $("tabs").innerHTML = ASSETS.map(a => `<button class="tab" role="tab" id="tab-${a.id}" aria-selected="${a.id === active}" data-id="${a.id}">${esc(a.name)}<span class="px">${fmt(a, a.now.p)}</span></button>`).join("");
+  $("tabs").querySelectorAll(".tab").forEach(b => b.addEventListener("click", () => { location.hash = b.dataset.id; }));
+}
+
+function spark(key, cap) {
+  const s = SERIES[key]; if (!s || s.length < 2) return "";
+  const W = 600, H = 64, ys = s.map(x => x[1]), mn = Math.min(...ys), mx = Math.max(...ys);
+  const X = i => i / (s.length - 1) * W, Y = v => H - 4 - (v - mn) / (mx - mn || 1) * (H - 8);
+  const d = s.map((x, i) => (i ? "L" : "M") + X(i).toFixed(1) + " " + Y(x[1]).toFixed(1)).join(" ");
+  const up = ys.at(-1) >= ys[0], col = up ? "var(--take)" : "var(--short)";
+  return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">
+    <defs><linearGradient id="g-${key}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".35"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>
+    <path d="${d} L${W} ${H} L0 ${H} Z" fill="url(#g-${key})"/>
+    <path d="${d}" fill="none" stroke="${col}" stroke-width="2" vector-effect="non-scaling-stroke"/>
+    <circle cx="${X(s.length - 1)}" cy="${Y(ys.at(-1))}" r="3.5" fill="${col}"/></svg>
+    <div class="spark-cap"><span>${esc(cap)}</span><span class="num">저 ${mn.toLocaleString()} / 고 ${mx.toLocaleString()}</span></div>`;
+}
+
+function render(id) {
+  const a = ASSETS.find(x => x.id === id) || ASSETS[0];
+  tabs(a.id);
+  const S = a.summary;
+  const H = Math.max(560, Math.min(780, window.innerHeight * 0.95)), PAD = 30;
+  const tf = a.scale === "log" ? Math.log : (v => v);
+  const y = p => PAD + (tf(a.hi) - tf(p)) / (tf(a.hi) - tf(a.lo)) * (H - PAD * 2);
+  const nLanes = a.lanes.length;
+
+  /* 지금 할 일 카드 */
+  let html = `<div class="grid2">
+    <div class="card">
+      <h3>${esc(S.title)} <span class="tag c-${S.tag[1]}">${esc(S.tag[0])}</span></h3>
+      <div class="big num">${esc(S.big)}${S.bigNote ? `<small>${esc(S.bigNote)}</small>` : ""}</div>
+      <ul class="rows">${S.rows.map(r => `<li><span>${esc(r[0])}</span><span>${esc(r[1])}</span></li>`).join("")}</ul>
+      <div class="next">다음: ${esc(S.next)}</div>
+    </div>
+    <div class="card">
+      <h3>현재가 <span class="muted" style="font-weight:500">${esc(a.now.at)} 기준</span></h3>
+      <div class="big num">${fmt(a, a.now.p)}</div>
+      ${a.spark ? spark(a.spark.key, a.spark.cap) : `<div class="muted" style="font-size:14px">${esc(a.note || "")}</div>`}
+    </div>
+  </div>`;
+
+  /* 가격 지도 */
+  const ticks = niceTicks(a);
+  let lad = `<div class="ladder" style="height:${H}px">`;
+  ticks.forEach(t => { lad += `<div class="gl" style="top:${y(t)}px"></div><div class="tick num" style="top:${y(t)}px">${fmt(a, t)}</div>`; });
+  lad += `<div class="lanes" style="grid-template-columns:repeat(${nLanes},1fr)">`;
+  a.lanes.forEach((ln, i) => {
+    lad += `<div class="lane"><div class="lane-head">${esc(ln)}</div>`;
+    a.items.filter(it => it.lane === i + 1).forEach(it => { lad += it.kind === "band" ? band(a, it, y) : level(a, it, y); });
+    lad += `</div>`;
+  });
+  lad += `</div>`;
+  a.items.filter(it => it.lane === 0).forEach(it => { lad += level(a, it, y, true); });
+  lad += `<div class="now" style="top:${y(a.now.p)}px"><span class="pill">${fmt(a, a.now.p)}<small>현재</small></span></div>`;
+  lad += `</div>`;
+
+  html += `<div class="mapcard">
+    <div class="maphead"><h2>${esc(a.name)} 가격 지도</h2>
+      <div class="legend">${legend(a)}</div></div>
+    ${lad}
+    ${a.chips ? `<div class="mapnote">${esc(a.chips.label)} ${a.chips.list.map(p => `<span class="chip">${fmt(a, p)} <span style="opacity:.7">${pct(a.now.p, p)}</span></span>`).join("")}</div>` : ""}
+    ${a.note && a.spark ? `<div class="mapnote">${esc(a.note)}</div>` : ""}
+  </div>`;
+
+  /* 레벨 표 */
+  const rows = a.items.map(it => ({ p: it.kind === "band" ? it.top : it.p, p2: it.kind === "band" ? it.bot : null, it }));
+  rows.push({ p: a.now.p, now: true });
+  rows.sort((m, n) => n.p - m.p);
+  html += `<div class="card"><h3>가격별 정리 (위에서 아래로)</h3><div class="table-box"><table class="lvtable">
+    <thead><tr><th>가격</th><th>내용</th><th style="text-align:right">거리</th></tr></thead><tbody>
+    ${rows.map(r => r.now
+      ? `<tr class="nowrow"><td class="p">${fmt(a, r.p)}</td><td>현재가 (${esc(a.now.at)})</td><td class="d">0%</td></tr>`
+      : `<tr><td class="p c-${r.it.c}">${fmt(a, r.p)}${r.p2 ? "~" + fmt(a, r.p2) : ""}</td><td>${esc(r.it.label)}${r.it.note ? ` <span class="muted">${esc(r.it.note)}</span>` : ""}${r.it.st ? `<span class="st c-${r.it.st[1]}">${esc(r.it.st[0])}</span>` : ""}</td><td class="d">${r.it.noDist ? "" : pct(a.now.p, r.p)}</td></tr>`).join("")}
+    </tbody></table></div></div>`;
+  if (a.empty) html += `<div class="empty">${esc(a.empty)}</div>`;
+  $("view").innerHTML = html;
+}
+
+function band(a, it, y) {
+  const h0 = y(it.bot) - y(it.top), hh = Math.max(58, h0), top = y(it.top) - (hh - h0) / 2;
+  const live = a.now.p <= it.top && a.now.p >= it.bot;
+  return `<div class="band ${it.c}${live ? " live" : ""}" style="top:${top}px;height:${hh}px"><strong>${esc(it.label)}</strong><span>${esc(it.note)}</span><em class="num" style="font-style:normal;font-size:12px;opacity:.8">${live ? "지금 이 구간" : pct(a.now.p, it.top) + " 부터"}</em></div>`;
+}
+function level(a, it, y, full) {
+  const cls = ["lvl", "c-" + it.c, it.dash ? "dash" : "", it.ref ? "ref" : "", it.gone ? "gone" : "", it.below ? "below" : "", full ? "full" : ""].join(" ");
+  return `<div class="${cls}" style="top:${y(it.p)}px"><div class="lab"><strong>${fmt(a, it.p)}</strong> ${esc(it.label)}${it.noDist ? "" : `<em>${pct(a.now.p, it.p)}</em>`}${it.note ? `<br><span>${esc(it.note)}</span>` : ""}</div></div>`;
+}
+function legend(a) {
+  const m = { short: "숏", take: "익절·매수", spot: "현물", fut: "선물", bottom: "바닥 예상", ref: "참고" };
+  return [...new Set(a.items.map(i => i.c))].map(c => `<span><i style="background:var(--${c})"></i>${m[c]}</span>`).join("");
+}
+function niceTicks(a) {
+  if (a.unit === "") return [100000, 90000, 80000, 70000, 60000, 50000, 40000, 30000, 25000, 21000].filter(t => t >= a.lo && t <= a.hi);
+  const span = a.hi - a.lo, step = span > 50 ? 10 : 5, out = [];
+  for (let t = Math.ceil(a.lo / step) * step; t <= a.hi; t += step) out.push(t);
+  return out;
+}
+
+$("rules").innerHTML = RULES.map(r => `<div class="rule"><q>${esc(r.q)}</q><p>${esc(r.p)}</p></div>`).join("");
+$("log").innerHTML = LOG.map(l => `<li><time>${esc(l.t)}</time><span>${esc(l.m)}</span></li>`).join("");
+
+const route = () => render((location.hash || "#btc").slice(1));
+window.addEventListener("hashchange", route);
+route();
+</script>
+</body>
+</html>
