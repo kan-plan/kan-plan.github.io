@@ -47,6 +47,8 @@ header h1 b { color: var(--spot); }
 .tabs { position: sticky; top: 0; z-index: 5; display: flex; gap: 6px; padding: 8px 0; background: linear-gradient(var(--bg) 70%, transparent); overflow-x: auto; }
 .tab { font-family: var(--display); font-size: 15px; font-weight: 600; color: var(--muted); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; cursor: pointer; white-space: nowrap; display: flex; gap: 8px; align-items: center; }
 .tab .px { font-weight: 500; font-size: 13px; color: var(--muted); }
+.dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--take); margin-right: 5px; vertical-align: 1px; animation: blink 1.6s infinite; }
+@keyframes blink { 50% { opacity: .25; } }
 .tab[aria-selected="true"] { color: var(--bg); background: var(--text); border-color: var(--text); }
 .tab[aria-selected="true"] .px { color: #3a4560; }
 
@@ -161,12 +163,12 @@ footer { color: var(--muted); font-size: 13px; border-top: 1px solid var(--line)
 
 <script>
 /* ======================= 업데이트는 여기만 고치면 돼요 ======================= */
-const UPDATED = "2026-11-06 08:46";
+const UPDATED = "2026-11-06 09:25";
 
 const ASSETS = [
   {
     id: "btc", name: "BTC", unit: "", scale: "log", lo: 20500, hi: 100000,
-    now: { p: 75590, at: "11/6 08:00" },
+    now: { p: 75590, at: "11/6 08:00" }, live: "BTC-USDT-SWAP",
     lanes: ["숏 관리", "현물", "선물"],
     summary: {
       title: "BTC", tag: ["숏 유지", "short"], big: "87.3k", bigNote: "숏 평단",
@@ -189,7 +191,7 @@ const ASSETS = [
   },
   {
     id: "soxl", name: "SOXL", unit: "$", scale: "log", lo: 33, hi: 70,
-    now: { p: 43.92, at: "11/5 미국장 중" },
+    now: { p: 43.92, at: "11/5 미국장 중" }, live: "SOXL-USDT-SWAP",
     lanes: ["매매 계획"],
     summary: {
       title: "SOXL (반도체 3배)", tag: ["매수 대기", "take"], big: "포지션 없음", bigNote: "",
@@ -229,6 +231,7 @@ const RULES = [
 ];
 
 const LOG = [
+  { t: "11/06 09:25", m: "BTC, SOXL 현재가를 실시간 시세로 연결 (OKX 무기한). 나스닥은 종가 기준." },
   { t: "11/06 08:50", m: "종목 탭 추가 (BTC, SOXL, 나스닥). 가격 지도에 현재가와 거리 표시." },
   { t: "11/06 08:37", m: "SOXL 포지션 없음으로 변경. 38, 36달러 매수 대기." },
   { t: "11/06 08:30", m: "첫 정리. BTC 숏 87.3k 유지, 76k 일봉 마감 시 추가, 1차 TP 59k. SOXL 30% 익절, 44 본전, 38·36 매수 자리." }
@@ -282,7 +285,7 @@ function render(id) {
       <div class="next">다음: ${esc(S.next)}</div>
     </div>
     <div class="card">
-      <h3>현재가 <span class="muted" style="font-weight:500">${esc(a.now.at)} 기준</span></h3>
+      <h3>현재가 ${a.isLive ? `<span class="tag c-take"><span class="dot"></span>실시간</span><span class="muted" style="font-weight:500">OKX 무기한 시세</span>` : `<span class="muted" style="font-weight:500">${esc(a.now.at)} 기준${a.live ? ", 실시간 연결 중" : ""}</span>`}</h3>
       <div class="big num">${fmt(a, a.now.p)}</div>
       ${a.spark ? spark(a.spark.key, a.spark.cap) : `<div class="muted" style="font-size:14px">${esc(a.note || "")}</div>`}
     </div>
@@ -318,7 +321,7 @@ function render(id) {
   html += `<div class="card"><h3>가격별 정리 (위에서 아래로)</h3><div class="table-box"><table class="lvtable">
     <thead><tr><th>가격</th><th>내용</th><th style="text-align:right">거리</th></tr></thead><tbody>
     ${rows.map(r => r.now
-      ? `<tr class="nowrow"><td class="p">${fmt(a, r.p)}</td><td>현재가 (${esc(a.now.at)})</td><td class="d">0%</td></tr>`
+      ? `<tr class="nowrow"><td class="p">${fmt(a, r.p)}</td><td>현재가 (${a.isLive ? "실시간" : esc(a.now.at)})</td><td class="d">0%</td></tr>`
       : `<tr><td class="p c-${r.it.c}">${fmt(a, r.p)}${r.p2 ? "~" + fmt(a, r.p2) : ""}</td><td>${esc(r.it.label)}${r.it.note ? ` <span class="muted">${esc(r.it.note)}</span>` : ""}${r.it.st ? `<span class="st c-${r.it.st[1]}">${esc(r.it.st[0])}</span>` : ""}</td><td class="d">${r.it.noDist ? "" : pct(a.now.p, r.p)}</td></tr>`).join("")}
     </tbody></table></div></div>`;
   if (a.empty) html += `<div class="empty">${esc(a.empty)}</div>`;
@@ -348,9 +351,37 @@ function niceTicks(a) {
 $("rules").innerHTML = RULES.map(r => `<div class="rule"><q>${esc(r.q)}</q><p>${esc(r.p)}</p></div>`).join("");
 $("log").innerHTML = LOG.map(l => `<li><time>${esc(l.t)}</time><span>${esc(l.m)}</span></li>`).join("");
 
-const route = () => render((location.hash || "#btc").slice(1));
+let current = (location.hash || "#btc").slice(1);
+const route = () => { current = (location.hash || "#btc").slice(1); render(current); };
 window.addEventListener("hashchange", route);
 route();
+
+/* 실시간 시세: OKX 공개 웹소켓 (로그인·키 없음). 끊기면 다시 연결, 안 되면 기준 시각 가격 유지 */
+(function live() {
+  const subs = ASSETS.filter(a => a.live);
+  if (!subs.length || !("WebSocket" in window)) return;
+  let ws, ping, wait = 2000, dirty = false;
+  const open = () => {
+    try { ws = new WebSocket("wss://ws.okx.com:8443/ws/v5/public"); } catch (e) { return; }
+    ws.onopen = () => {
+      wait = 2000;
+      ws.send(JSON.stringify({ op: "subscribe", args: subs.map(a => ({ channel: "tickers", instId: a.live })) }));
+      clearInterval(ping); ping = setInterval(() => { try { ws.send("ping"); } catch (e) {} }, 25000);
+    };
+    ws.onmessage = ev => {
+      if (ev.data === "pong") return;
+      let m; try { m = JSON.parse(ev.data); } catch (e) { return; }
+      if (!m.data || !m.arg) return;
+      const a = subs.find(x => x.live === m.arg.instId), px = parseFloat(m.data[0] && m.data[0].last);
+      if (!a || !(px > 0)) return;
+      a.now.p = px; a.isLive = true; dirty = true;
+    };
+    ws.onclose = () => { clearInterval(ping); subs.forEach(a => a.isLive = false); dirty = true; setTimeout(open, wait); wait = Math.min(wait * 2, 60000); };
+    ws.onerror = () => { try { ws.close(); } catch (e) {} };
+  };
+  open();
+  setInterval(() => { if (dirty && !document.hidden) { dirty = false; render(current); } }, 2000);
+})();
 </script>
 </body>
 </html>
