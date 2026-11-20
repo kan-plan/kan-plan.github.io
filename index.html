@@ -168,7 +168,7 @@ footer { color: var(--muted); font-size: 13px; border-top: 1px solid var(--line)
 
 <script>
 /* ======================= 업데이트는 여기만 고치면 돼요 ======================= */
-const UPDATED = "2026-11-15 14:55";
+const UPDATED = "2026-11-21 03:00";
 
 const ASSETS = [
   {
@@ -198,22 +198,22 @@ const ASSETS = [
     spark: { key: "BTC", cap: "최근 4일 (1시간봉)" }
   },
   {
-    id: "soxl", name: "SOXL", unit: "$", scale: "log", lo: 22, hi: 72,
+    id: "soxl", name: "SOXL", unit: "$", scale: "log", lo: 20, hi: 72,
     now: { p: 43.92, at: "11/5 미국장 중" }, live: "SOXL-USDT-SWAP",
     lanes: ["매매 계획"],
     summary: {
       title: "SOXL (반도체 3배)", tag: ["매수 대기", "take"], big: "포지션 없음", bigNote: "",
-      rows: [["지금", "포지션 없음 (11/14 확인)"], ["매수 계획", "$36~28 분할 매수"], ["지난 매매", "30% 익절, 나머지 본전($44) 정리"], ["레버리지", "절대 금지"]],
-      next: "36달러부터 28달러까지 나눠서 매수 예정"
+      rows: [["지금", "포지션 없음"], ["매수 계획", "$28, $23 지정가 (11/21)"], ["지난 매매", "30% 익절, 나머지 본전($44) 정리"], ["레버리지", "절대 금지"]],
+      next: "28달러와 23달러에 지정가 매수 주문을 걸어둘 예정"
     },
     items: [
       { kind: "level", lane: 0, p: 66.68, c: "ref", ref: true, label: "11/4 종가", note: "11/5 반도체 폭락 직전", noDist: false },
       { kind: "level", lane: 1, p: 45, c: "take", label: "매수 자리", note: "지나감, 안 받음", gone: true, st: ["지나감", "ref"] },
       { kind: "level", lane: 1, p: 44, c: "short", dash: true, below: true, label: "평단·본전", note: "본전에서 정리 완료", st: ["완료", "ref"] },
       { kind: "level", lane: 1, p: 38, c: "take", dash: true, label: "이전 언급 자리", note: "11/6 글엔 36만 언급", st: ["참고", "ref"] },
-      { kind: "level", lane: 1, p: 36, c: "take", label: "분할 매수 시작", note: "그 밑은 지지 없음", st: ["대기", "take"] },
-      { kind: "band", lane: 1, top: 36, bot: 28, c: "take", label: "36~28 분할 매수", note: "나눠서 담기 (11/14)", st: ["대기", "take"] },
-      { kind: "level", lane: 1, p: 28, c: "take", dash: true, below: true, label: "분할 매수 끝", note: "", st: ["대기", "take"] }
+      { kind: "level", lane: 1, p: 36, c: "take", dash: true, label: "이전 계획 36~28 분할", note: "11/21 28·23 지정가로 변경", gone: true, st: ["변경", "ref"] },
+      { kind: "level", lane: 1, p: 28, c: "take", label: "지정가 매수 1", note: "11/21", st: ["대기", "take"] },
+      { kind: "level", lane: 1, p: 23, c: "take", label: "지정가 매수 2", note: "11/21", st: ["대기", "take"] }
     ],
     note: "11/5 반도체지수 −12.25%, SOXL은 장중 −34%까지 빠졌어요. 칸: 속슬에 레버리지 끼면 진짜 노답"
   },
@@ -250,6 +250,7 @@ const NOTES = { at: "11/06 17:55", title: "이쯤에서 보는 미장", items: [
 ], foot: "하락은 피했지만 너무 많은 사람이 피를 흘려서 마음 아프네요." };
 
 const LOG = [
+  { t: "11/21 03:00", m: "칸 11/21 02:55: SOXL 28달러, 23달러 지정가 매수 오픈 예정 (이전 36~28 분할 계획 대체). BTC는 여전히 유지." },
   { t: "11/15 14:55", m: "칸 11/14 21:54: BTC 스윙 숏 1차 TP 59k → 56k, 닿으면 물량 50% 정리. SOXL 포지션 없음, 36~28 분할 매수 예정. 나머지 변동 없음." },
   { t: "11/06 18:10", m: "BTC: 76k 위 마감으로 추가 숏 보류, 74.9k 깨고 리젝 약하면 추가. 62k 하방 열림 메모. SOXL 다음 자리 36, 36~25 반등 기대. 미장 코멘트, 레버리지 원칙 추가." },
   { t: "11/06 09:25", m: "BTC, SOXL 현재가를 실시간 시세로 연결 (OKX 무기한). 나스닥은 종가 기준." },
