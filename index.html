@@ -172,7 +172,7 @@ const UPDATED = "2026-11-21 16:05";
 
 const ASSETS = [
   {
-    id: "btc", name: "BTC", unit: "", scale: "log", lo: 20500, hi: 100000,
+    id: "btc", name: "BTC", unit: "", scale: "log", lo: 20500, hi: 92000,
     now: { p: 75590, at: "11/6 08:00" }, live: "BTC-USDT-SWAP",
     lanes: ["스윙", "현물", "선물"],
     summary: {
@@ -182,10 +182,7 @@ const ASSETS = [
     },
     items: [
       { kind: "level", lane: 1, p: 85677.9, c: "short", label: "숏 진입가", note: "1차 TP 후 50% 보유", st: ["보유", "short"] },
-      { kind: "level", lane: 1, p: 76000, c: "short", dash: true, label: "추가 조건 (11/5)", note: "76k 위 마감이라 보류", gone: true, st: ["보류", "ref"] },
-      { kind: "level", lane: 1, p: 74900, c: "short", dash: true, below: true, label: "숏 추가", note: "74.9k 깨고 리젝 약하면", gone: true, st: ["지나감", "ref"] },
       { kind: "level", lane: 0, p: 62000, c: "bottom", dash: true, label: "호가 빈 구간, 언제든 갈 수 있음", note: "" },
-      { kind: "level", lane: 1, p: 56000, c: "take", label: "1차 TP · 물량 50% 정리", note: "11/21 도달, 55,963.5 청산", st: ["도달", "take"] },
       { kind: "band", lane: 1, top: 47000, bot: 35000, c: "take", label: "남은 50% 분할 익절", note: "35~47k까지 나눠서 정리", st: ["대기", "spot"] },
       { kind: "band", lane: 3, top: 51700, bot: 50500, c: "fut", label: "롱 51.7k · 50.5k", note: "11월 안에 51.7k 오면 매수 (11/21)", st: ["대기", "spot"] },
       { kind: "level", lane: 3, p: 45000, c: "fut", label: "롱 45k", note: "11/21", st: ["대기", "spot"] },
@@ -199,24 +196,19 @@ const ASSETS = [
     spark: { key: "BTC", cap: "최근 4일 (1시간봉)" }
   },
   {
-    id: "soxl", name: "SOXL", unit: "$", scale: "log", lo: 20, hi: 72,
+    id: "soxl", name: "SOXL", unit: "$", scale: "log", lo: 20, hi: 45,
     now: { p: 43.92, at: "11/5 미국장 중" }, live: "SOXL-USDT-SWAP",
     lanes: ["매매 계획"],
     summary: {
       title: "SOXL (반도체 3배)", tag: ["매수 대기", "take"], big: "포지션 없음", bigNote: "",
-      rows: [["지금", "포지션 없음"], ["매수 계획", "$28, $23 지정가 (11/21)"], ["지난 매매", "30% 익절, 나머지 본전($44) 정리"], ["레버리지", "절대 금지"]],
+      rows: [["지금", "포지션 없음"], ["매수 계획", "$28, $23 지정가 (11/21)"], ["레버리지", "절대 금지"]],
       next: "28달러와 23달러에 지정가 매수 주문을 걸어둘 예정"
     },
     items: [
-      { kind: "level", lane: 0, p: 66.68, c: "ref", ref: true, label: "11/4 종가", note: "11/5 반도체 폭락 직전", noDist: false },
-      { kind: "level", lane: 1, p: 45, c: "take", label: "매수 자리", note: "지나감, 안 받음", gone: true, st: ["지나감", "ref"] },
-      { kind: "level", lane: 1, p: 44, c: "short", dash: true, below: true, label: "평단·본전", note: "본전에서 정리 완료", st: ["완료", "ref"] },
-      { kind: "level", lane: 1, p: 38, c: "take", dash: true, label: "이전 언급 자리", note: "11/6 글엔 36만 언급", st: ["참고", "ref"] },
-      { kind: "level", lane: 1, p: 36, c: "take", dash: true, label: "이전 계획 36~28 분할", note: "11/21 28·23 지정가로 변경", gone: true, st: ["변경", "ref"] },
       { kind: "level", lane: 1, p: 28, c: "take", label: "지정가 매수 1", note: "11/21", st: ["대기", "take"] },
       { kind: "level", lane: 1, p: 23, c: "take", label: "지정가 매수 2", note: "11/21", st: ["대기", "take"] }
     ],
-    note: "11/5 반도체지수 −12.25%, SOXL은 장중 −34%까지 빠졌어요. 칸: 속슬에 레버리지 끼면 진짜 노답"
+    note: "칸: 속슬에 레버리지 끼면 진짜 노답"
   },
   {
     id: "nasdaq", name: "나스닥", unit: "$", scale: "linear", lo: 250, hi: 322,
@@ -237,7 +229,7 @@ const ASSETS = [
 ];
 
 const RULES = [
-  { q: "이미 지나간 자리는 안 받는다", p: "놓친 매수 자리를 쫓아가서 사지 않아요. 예: SOXL 45는 지나갔으니 다음은 36." },
+  { q: "이미 지나간 자리는 안 받는다", p: "놓친 매수 자리를 쫓아가서 사지 않아요. 예: SOXL 45·36은 지나갔으니 다음은 28, 23." },
   { q: "반등 10% 이상 나온 뒤 본전 건드리면 본전에서 정리", p: "한 번 크게 반등한 포지션은 손실로 돌리지 않아요." },
   { q: "하락장 받아먹기(하따)는 절대 레버리지 끼고 받지 않는다", p: "특히 SOXL처럼 이미 3배인 상품에 레버리지를 더 얹는 건 금지." }
 ];
@@ -246,11 +238,11 @@ const NOTES = { at: "11/06 17:55", title: "이쯤에서 보는 미장", items: [
   { k: "샌디스크", v: "1800불 숏으로 스윙 익절. 근본적으로 300불 간다고 봤는데 이대로면 금방 갈 듯" },
   { k: "SK하이닉스", v: "아쉽지만 상폐엔딩 날 거 같음 (원문 표현)" },
   { k: "삼성전자", v: "모르겠지만 8 정도는 지지해줄 듯" },
-  { k: "엔비디아", v: "55불 가면 주식으로 다 담으면 될 듯" },
-  { k: "SOXL", v: "45 뚫렸으니 다음은 36, 그 밑은 텅텅. 36~25 부근에서 데드캣 80% 나왔으면" }
+  { k: "엔비디아", v: "55불 가면 주식으로 다 담으면 될 듯" }
 ], foot: "하락은 피했지만 너무 많은 사람이 피를 흘려서 마음 아프네요." };
 
 const LOG = [
+  { t: "11/21 16:10", m: "지나간 계획 정리: BTC 76k·74.9k 추가 숏, 56k 1차 TP(도달), SOXL 45·44·38·36 자리와 11/4 종가 표시를 지웠어요. 남은 건 지금 유효한 자리만." },
   { t: "11/21 16:05", m: "칸 11/21 13:24~13:36: BTC 스윙 숏 3달 만에 1차 TP 도달 (진입 85,677.9 → 55,963.5, 물량 50%). 롱 자리 51.7k, 50.5k, 45k. 지금은 별 생각 없고 11월 안에 51.7k 오면 매수 예정." },
   { t: "11/21 03:00", m: "칸 11/21 02:55: SOXL 28달러, 23달러 지정가 매수 오픈 예정 (이전 36~28 분할 계획 대체). BTC는 여전히 유지." },
   { t: "11/15 14:55", m: "칸 11/14 21:54: BTC 스윙 숏 1차 TP 59k → 56k, 닿으면 물량 50% 정리. SOXL 포지션 없음, 36~28 분할 매수 예정. 나머지 변동 없음." },
